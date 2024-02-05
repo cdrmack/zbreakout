@@ -1,0 +1,3 @@
+#+begin_src shell
+  zig build-exe main.zig -lc -lraylib
+#+end_src
