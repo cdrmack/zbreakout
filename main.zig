@@ -35,32 +35,36 @@ pub fn input(player: *Player) void {
     }
 }
 
+pub fn makeVector2(x: f32, y: f32) ray.Vector2 {
+    return ray.Vector2{
+        .x = x,
+        .y = y,
+    };
+}
+
+pub fn makeRectangle(x: f32, y: f32, width: f32, height: f32) ray.Rectangle {
+    return ray.Rectangle{
+        .x = x,
+        .y = y,
+        .width = width,
+        .height = height,
+    };
+}
+
 pub fn main() void {
     ray.InitWindow(screen_width, screen_height, "zbreakout");
     defer ray.CloseWindow();
 
     ray.SetTargetFPS(60);
 
-    const start_position = ray.Vector2{
-        .x = screen_width / 2,
-        .y = screen_height / 2,
-    };
-
     var ball = Ball{
-        .position = start_position,
+        .position = makeVector2(screen_width / 2, screen_height / 2),
         .radius = 8,
         .color = ray.RED,
     };
 
-    const player_rectangle = ray.Rectangle{
-        .x = (screen_width / 2) - (player_width / 2),
-        .y = screen_height - 50,
-        .width = player_width,
-        .height = player_height,
-    };
-
     var player = Player{
-        .rectangle = player_rectangle,
+        .rectangle = makeRectangle((screen_width / 2) - (player_width / 2), screen_height - 50, player_width, player_height),
         .color = ray.GREEN,
     };
 
