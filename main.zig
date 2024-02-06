@@ -11,6 +11,30 @@ const player_height = 10;
 const Ball = struct { position: ray.Vector2, radius: f32, color: ray.Color };
 const Player = struct { rectangle: ray.Rectangle, color: ray.Color };
 
+const Direction = enum { left, right };
+
+pub fn playerCanMove(player: *Player, direction: Direction) bool {
+    if (direction == Direction.left) {
+        return if (player.rectangle.x > 0) true else false;
+    } else {
+        return if ((player.rectangle.x + player.rectangle.width) < screen_width) true else false;
+    }
+}
+
+pub fn input(player: *Player) void {
+    if (ray.IsKeyDown(ray.KEY_RIGHT)) {
+        if (playerCanMove(player, Direction.right)) {
+            player.rectangle.x += 10;
+        }
+    }
+
+    if (ray.IsKeyDown(ray.KEY_LEFT)) {
+        if (playerCanMove(player, Direction.left)) {
+            player.rectangle.x -= 10;
+        }
+    }
+}
+
 pub fn main() void {
     ray.InitWindow(screen_width, screen_height, "zbreakout");
     defer ray.CloseWindow();
@@ -41,10 +65,14 @@ pub fn main() void {
     };
 
     while (!ray.WindowShouldClose()) {
+        // input
+        input(&player);
+
+        // render
         ray.BeginDrawing();
         defer ray.EndDrawing();
 
-        // render
+        ray.ClearBackground(ray.BLACK);
         ray.DrawCircleV(ball.position, ball.radius, ball.color);
         ray.DrawRectangleRec(player.rectangle, player.color);
     }
