@@ -3,12 +3,15 @@ const ray = @cImport({
     @cInclude("raylib.h");
 });
 
+const screen_width = 400;
+const screen_height = 400;
+const player_width = 100;
+const player_height = 10;
+
 const Ball = struct { position: ray.Vector2, radius: f32, color: ray.Color };
+const Player = struct { rectangle: ray.Rectangle, color: ray.Color };
 
 pub fn main() void {
-    const screen_width = 400;
-    const screen_height = 800;
-
     ray.InitWindow(screen_width, screen_height, "zbreakout");
     defer ray.CloseWindow();
 
@@ -16,7 +19,7 @@ pub fn main() void {
 
     const start_position = ray.Vector2{
         .x = screen_width / 2,
-        .y = screen_height - 50, // TODO(cdrmack), remove magic number
+        .y = screen_height / 2,
     };
 
     var ball = Ball{
@@ -25,10 +28,24 @@ pub fn main() void {
         .color = ray.RED,
     };
 
+    const player_rectangle = ray.Rectangle{
+        .x = (screen_width / 2) - (player_width / 2),
+        .y = screen_height - 50,
+        .width = player_width,
+        .height = player_height,
+    };
+
+    var player = Player{
+        .rectangle = player_rectangle,
+        .color = ray.GREEN,
+    };
+
     while (!ray.WindowShouldClose()) {
         ray.BeginDrawing();
         defer ray.EndDrawing();
 
+        // render
         ray.DrawCircleV(ball.position, ball.radius, ball.color);
+        ray.DrawRectangleRec(player.rectangle, player.color);
     }
 }
