@@ -15,7 +15,9 @@ const bricks_count = 40;
 const bricks_per_row = 10;
 const brick_gap = (screen_width - (bricks_per_row * brick_width)) / (bricks_per_row + 1);
 
-const Ball = struct { position: ray.Vector2, radius: f32, color: ray.Color };
+const ball_radius = 8;
+
+const Ball = struct { position: ray.Vector2, velocity: ray.Vector2, radius: f32, color: ray.Color };
 const Player = struct { rectangle: ray.Rectangle, color: ray.Color };
 const Brick = struct { rectangle: ray.Rectangle, color: ray.Color };
 
@@ -23,14 +25,14 @@ const Direction = enum { left, right };
 
 var g_bricks: [bricks_count]Brick = undefined;
 
-pub fn makeVector2(x: f32, y: f32) ray.Vector2 {
+fn makeVector2(x: f32, y: f32) ray.Vector2 {
     return ray.Vector2{
         .x = x,
         .y = y,
     };
 }
 
-pub fn makeRectangle(x: f32, y: f32, width: f32, height: f32) ray.Rectangle {
+fn makeRectangle(x: f32, y: f32, width: f32, height: f32) ray.Rectangle {
     return ray.Rectangle{
         .x = x,
         .y = y,
@@ -39,7 +41,7 @@ pub fn makeRectangle(x: f32, y: f32, width: f32, height: f32) ray.Rectangle {
     };
 }
 
-pub fn playerCanMove(player: *Player, direction: Direction) bool {
+fn playerCanMove(player: *Player, direction: Direction) bool {
     if (direction == Direction.left) {
         return if (player.rectangle.x > 0) true else false;
     } else {
@@ -47,7 +49,7 @@ pub fn playerCanMove(player: *Player, direction: Direction) bool {
     }
 }
 
-pub fn input(player: *Player) void {
+fn input(player: *Player) void {
     if (ray.IsKeyDown(ray.KEY_RIGHT)) {
         if (playerCanMove(player, Direction.right)) {
             player.rectangle.x += 10;
@@ -61,7 +63,7 @@ pub fn input(player: *Player) void {
     }
 }
 
-pub fn initializeBricks() void {
+fn initializeBricks() void {
     var column: u32 = 0;
     var brick_index: u32 = 0;
     var position_y: f32 = @floatFromInt(brick_gap);
@@ -72,8 +74,6 @@ pub fn initializeBricks() void {
         g_bricks[brick_index].rectangle.width = brick_width;
         g_bricks[brick_index].rectangle.height = brick_height;
         g_bricks[brick_index].color = ray.BLUE;
-
-        ray.TraceLog(ray.LOG_INFO, "Brick %d, x = %f, y = %f", brick_index, g_bricks[brick_index].rectangle.x, g_bricks[brick_index].rectangle.y);
 
         if ((brick_index + 1) % bricks_per_row == 0) {
             column = 0;
@@ -90,10 +90,38 @@ pub fn initializeBricks() void {
     }
 }
 
-pub fn renderBricks() void {
+fn renderBricks() void {
     for (g_bricks) |brick| {
         ray.DrawRectangleRec(brick.rectangle, brick.color);
     }
+}
+
+fn ballBounce(ball: *Ball) void {
+    // world bounds
+    if (ball.position.y >= screen_height) {
+        ray.TraceLog(ray.LOG_INFO, "Game Over!");
+        return;
+    }
+
+    const hit_left_edge = ball.position.x <= ball_radius;
+    const hit_right_edge = ball.position.x >= (screen_width - ball_radius);
+
+    if (hit_left_edge or hit_right_edge) {
+        ball.velocity.x *= -1.0;
+        return;
+    }
+
+    if (ball.position.y <= ball_radius) {
+        ball.velocity.y *= -1.0;
+        return;
+    }
+}
+
+fn ballTick(ball: *Ball) void {
+    ball.position.x += ball.velocity.x;
+    ball.position.y += ball.velocity.y;
+
+    ballBounce(ball);
 }
 
 pub fn main() void {
@@ -103,8 +131,9 @@ pub fn main() void {
     ray.SetTargetFPS(60);
 
     var ball = Ball{
-        .position = makeVector2(screen_width / 2, screen_height - 100), // TODO(cdrmack), remove magic number
-        .radius = 8,
+        .position = makeVector2(screen_width / 2, screen_height / 2),
+        .velocity = makeVector2(4.0, -2.0),
+        .radius = ball_radius,
         .color = ray.RED,
     };
 
@@ -118,6 +147,9 @@ pub fn main() void {
     while (!ray.WindowShouldClose()) {
         // input
         input(&player);
+
+        // tick
+        ballTick(&ball);
 
         // render
         ray.BeginDrawing();
