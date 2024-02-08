@@ -96,7 +96,15 @@ fn renderBricks() void {
     }
 }
 
-fn ballBounce(ball: *Ball) void {
+fn renderBall(ball: *Ball) void {
+    ray.DrawCircleV(ball.position, ball.radius, ball.color);
+}
+
+fn renderPlayer(player: *Player) void {
+    ray.DrawRectangleRec(player.rectangle, player.color);
+}
+
+fn ballBounce(ball: *Ball, player: *Player) void {
     // world bounds
     if (ball.position.y >= screen_height) {
         ray.TraceLog(ray.LOG_INFO, "Game Over!");
@@ -115,13 +123,19 @@ fn ballBounce(ball: *Ball) void {
         ball.velocity.y *= -1.0;
         return;
     }
+
+    // player
+    if (ray.CheckCollisionCircleRec(ball.position, ball_radius, player.rectangle)) {
+        ball.velocity.y *= -1.0;
+        return;
+    }
 }
 
-fn ballTick(ball: *Ball) void {
+fn ballTick(ball: *Ball, player: *Player) void {
     ball.position.x += ball.velocity.x;
     ball.position.y += ball.velocity.y;
 
-    ballBounce(ball);
+    ballBounce(ball, player);
 }
 
 pub fn main() void {
@@ -149,15 +163,16 @@ pub fn main() void {
         input(&player);
 
         // tick
-        ballTick(&ball);
+        ballTick(&ball, &player);
 
         // render
         ray.BeginDrawing();
         defer ray.EndDrawing();
 
         ray.ClearBackground(ray.BLACK);
-        ray.DrawCircleV(ball.position, ball.radius, ball.color);
-        ray.DrawRectangleRec(player.rectangle, player.color);
+
+        renderPlayer(&player);
+        renderBall(&ball);
         renderBricks();
     }
 }
