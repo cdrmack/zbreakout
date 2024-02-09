@@ -104,8 +104,7 @@ fn renderPlayer(player: *Player) void {
     ray.DrawRectangleRec(player.rectangle, player.color);
 }
 
-fn ballBounce(ball: *Ball, player: *Player) void {
-    // world bounds
+fn ballBounceFromEdges(ball: *Ball) void {
     if (ball.position.y >= screen_height) {
         ray.TraceLog(ray.LOG_INFO, "Game Over!");
         return;
@@ -123,6 +122,24 @@ fn ballBounce(ball: *Ball, player: *Player) void {
         ball.velocity.y *= -1.0;
         return;
     }
+}
+
+fn ballBounceFromBrick(ball: *Ball) void {
+    for (&g_bricks) |*brick| {
+        if (ray.CheckCollisionCircleRec(ball.position, ball_radius, brick.rectangle)) {
+            brick.rectangle.x = -200.0; // move enemy outside the screen
+            ball.velocity.y *= -1.0;
+            return;
+        }
+    }
+}
+
+fn ballBounce(ball: *Ball, player: *Player) void {
+    // world bounds
+    ballBounceFromEdges(ball);
+
+    // bricks
+    ballBounceFromBrick(ball);
 
     // player
     if (ray.CheckCollisionCircleRec(ball.position, ball_radius, player.rectangle)) {
