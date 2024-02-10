@@ -24,6 +24,7 @@ const Brick = struct { rectangle: ray.Rectangle, color: ray.Color };
 const Direction = enum { left, right };
 
 var g_bricks: [bricks_count]Brick = undefined;
+var g_score: u32 = 0;
 
 fn makeVector2(x: f32, y: f32) ray.Vector2 {
     return ray.Vector2{
@@ -107,7 +108,7 @@ fn renderPlayer(player: *Player) void {
 fn ballBounceFromEdges(ball: *Ball) void {
     if (ball.position.y >= screen_height) {
         ray.TraceLog(ray.LOG_INFO, "Game Over!");
-        return;
+        ray.TraceLog(ray.LOG_INFO, "Score: %d", g_score);
     }
 
     const hit_left_edge = ball.position.x <= ball_radius;
@@ -127,6 +128,7 @@ fn ballBounceFromEdges(ball: *Ball) void {
 fn ballBounceFromBrick(ball: *Ball) void {
     for (&g_bricks) |*brick| {
         if (ray.CheckCollisionCircleRec(ball.position, ball_radius, brick.rectangle)) {
+            g_score += 1;
             brick.rectangle.x = -200.0; // move enemy outside the screen
             ball.velocity.y *= -1.0;
             return;
@@ -155,7 +157,7 @@ fn ballTick(ball: *Ball, player: *Player) void {
     ballBounce(ball, player);
 }
 
-pub fn main() void {
+pub fn main() !void {
     ray.InitWindow(screen_width, screen_height, "zbreakout");
     defer ray.CloseWindow();
 
@@ -175,6 +177,7 @@ pub fn main() void {
 
     initializeBricks();
 
+    var score_buffer: [20]u8 = undefined;
     while (!ray.WindowShouldClose()) {
         // input
         input(&player);
@@ -191,5 +194,8 @@ pub fn main() void {
         renderPlayer(&player);
         renderBall(&ball);
         renderBricks();
+
+        const score_string: [:0]u8 = try std.fmt.bufPrintZ(&score_buffer, "Score: {d}", .{g_score});
+        ray.DrawText(@as([*c]const u8, @ptrCast(score_string)), 10, screen_height - 34, 24, ray.WHITE);
     }
 }
