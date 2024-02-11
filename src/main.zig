@@ -92,7 +92,7 @@ fn initializeBricks() void {
 }
 
 fn renderBricks() void {
-    for (g_bricks) |brick| {
+    for (&g_bricks) |*brick| {
         ray.DrawRectangleRec(brick.rectangle, brick.color);
     }
 }
