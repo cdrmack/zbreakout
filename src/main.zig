@@ -79,7 +79,38 @@ const Ball = struct {
         self.bounce(player);
     }
 };
-const Player = struct { rectangle: ray.Rectangle, color: ray.Color };
+
+const Player = struct {
+    rectangle: ray.Rectangle,
+    color: ray.Color,
+
+    fn render(self: *Player) void {
+        ray.DrawRectangleRec(self.rectangle, self.color);
+    }
+
+    fn canMove(self: *Player, direction: Direction) bool {
+        if (direction == Direction.left) {
+            return if (self.rectangle.x > 0) true else false;
+        } else {
+            return if ((self.rectangle.x + self.rectangle.width) < screen_width) true else false;
+        }
+    }
+
+    fn input(self: *Player) void {
+        if (ray.IsKeyDown(ray.KEY_RIGHT)) {
+            if (self.canMove(Direction.right)) {
+                self.rectangle.x += 10;
+            }
+        }
+
+        if (ray.IsKeyDown(ray.KEY_LEFT)) {
+            if (self.canMove(Direction.left)) {
+                self.rectangle.x -= 10;
+            }
+        }
+    }
+};
+
 const Brick = struct { rectangle: ray.Rectangle, color: ray.Color };
 
 const Direction = enum { left, right };
@@ -101,28 +132,6 @@ fn makeRectangle(x: f32, y: f32, width: f32, height: f32) ray.Rectangle {
         .width = width,
         .height = height,
     };
-}
-
-fn playerCanMove(player: *Player, direction: Direction) bool {
-    if (direction == Direction.left) {
-        return if (player.rectangle.x > 0) true else false;
-    } else {
-        return if ((player.rectangle.x + player.rectangle.width) < screen_width) true else false;
-    }
-}
-
-fn input(player: *Player) void {
-    if (ray.IsKeyDown(ray.KEY_RIGHT)) {
-        if (playerCanMove(player, Direction.right)) {
-            player.rectangle.x += 10;
-        }
-    }
-
-    if (ray.IsKeyDown(ray.KEY_LEFT)) {
-        if (playerCanMove(player, Direction.left)) {
-            player.rectangle.x -= 10;
-        }
-    }
 }
 
 fn initializeBricks() void {
@@ -158,10 +167,6 @@ fn renderBricks() void {
     }
 }
 
-fn renderPlayer(player: *Player) void {
-    ray.DrawRectangleRec(player.rectangle, player.color);
-}
-
 pub fn main() !void {
     ray.InitWindow(screen_width, screen_height, "zbreakout");
     defer ray.CloseWindow();
@@ -185,7 +190,7 @@ pub fn main() !void {
     var score_buffer: [20]u8 = undefined;
     while (!ray.WindowShouldClose()) {
         // input
-        input(&player);
+        player.input();
 
         // tick
         ball.tick(&player);
@@ -196,7 +201,7 @@ pub fn main() !void {
 
         ray.ClearBackground(ray.BLACK);
 
-        renderPlayer(&player);
+        player.render();
         ball.render();
         renderBricks();
 
