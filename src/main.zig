@@ -38,12 +38,10 @@ const Ball = struct {
 
         if (hit_left_edge or hit_right_edge) {
             self.velocity.x *= -1.0;
-            return;
         }
 
         if (self.position.y <= ball_radius) {
             self.velocity.y *= -1.0;
-            return;
         }
     }
 
@@ -51,7 +49,7 @@ const Ball = struct {
         for (&g_bricks) |*brick| {
             if (ray.CheckCollisionCircleRec(self.position, ball_radius, brick.rectangle)) {
                 g_score += 1;
-                brick.rectangle.x = -200.0; // move enemy outside the screen
+                brick.rectangle.x = -200.0; // move brick outside the screen
                 self.velocity.y *= -1.0;
                 return;
             }
