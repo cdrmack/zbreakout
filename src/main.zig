@@ -87,7 +87,7 @@ const Player = struct {
     }
 
     fn canMove(self: *Player, direction: Direction) bool {
-        if (direction == Direction.left) {
+        if (direction == .left) {
             return self.rectangle.x > 0;
         } else {
             return ((self.rectangle.x + self.rectangle.width) < screen_width);
@@ -96,13 +96,13 @@ const Player = struct {
 
     fn input(self: *Player) void {
         if (ray.IsKeyDown(ray.KEY_RIGHT)) {
-            if (self.canMove(Direction.right)) {
+            if (self.canMove(.right)) {
                 self.rectangle.x += 10;
             }
         }
 
         if (ray.IsKeyDown(ray.KEY_LEFT)) {
-            if (self.canMove(Direction.left)) {
+            if (self.canMove(.left)) {
                 self.rectangle.x -= 10;
             }
         }
