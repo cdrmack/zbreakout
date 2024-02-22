@@ -88,9 +88,9 @@ const Player = struct {
 
     fn canMove(self: *Player, direction: Direction) bool {
         if (direction == Direction.left) {
-            return if (self.rectangle.x > 0) true else false;
+            return self.rectangle.x > 0;
         } else {
-            return if ((self.rectangle.x + self.rectangle.width) < screen_width) true else false;
+            return ((self.rectangle.x + self.rectangle.width) < screen_width);
         }
     }
 
