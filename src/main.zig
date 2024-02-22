@@ -198,6 +198,6 @@ pub fn main() !void {
         renderBricks();
 
         const score_string: [:0]u8 = try std.fmt.bufPrintZ(&score_buffer, "Score: {d}", .{g_score});
-        ray.DrawText(@as([*c]const u8, @ptrCast(score_string)), 10, screen_height - 34, 24, ray.WHITE);
+        ray.DrawText(score_string.ptr, 10, screen_height - 34, 24, ray.WHITE);
     }
 }
