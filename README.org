@@ -5,3 +5,5 @@ Minimalistic breakout clone. Expects [[https://github.com/raysan5/raylib][raylib
 #+end_src
 
 [[./zbreakout.png]]
+
+Big thanks to [[https://github.com/cipharius][cipharius]] for the code review!
