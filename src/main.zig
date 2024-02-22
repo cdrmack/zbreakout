@@ -137,7 +137,7 @@ fn initializeBricks() void {
     var brick_index: u32 = 0;
     var position_y: f32 = @floatFromInt(brick_gap);
 
-    while (true) {
+    while (brick_index < bricks_count) : (brick_index += 1) {
         g_bricks[brick_index].rectangle.x = @floatFromInt((column + 1) * brick_gap + (column * brick_width));
         g_bricks[brick_index].rectangle.y = position_y;
         g_bricks[brick_index].rectangle.width = brick_width;
@@ -149,12 +149,6 @@ fn initializeBricks() void {
             position_y += (2 * brick_height);
         } else {
             column += 1;
-        }
-
-        brick_index += 1;
-
-        if (brick_index >= bricks_count) {
-            break;
         }
     }
 }
