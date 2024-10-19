@@ -7,3 +7,5 @@ Minimalistic breakout clone. Expects [[https://github.com/raysan5/raylib][raylib
 [[./zbreakout.png]]
 
 Big thanks to [[https://github.com/cipharius][cipharius]] for the code review!
+
+Compiled with =zig 0.14.0-dev.1939+816dfca0b=.
