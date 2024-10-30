@@ -1,2 +1,4 @@
-*       text=auto
-*.png   binary
+*.org	text
+*.zig	text
+*.zon	text
+*.png	binary
