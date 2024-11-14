@@ -1,4 +1,4 @@
-*.org	text
+*.md	text
 *.zig	text
 *.zon	text
 *.png	binary
